@@ -7,7 +7,7 @@ library(caret)
 library(Lahman)
 
 
-## this will be used for melding, maybee for everything??
+## this will be used for melding, maybe for everything??
 myBatting <- Batting %>% filter(yearID > "2020" & AB > 200)
 
 shinyServer(function(input, output, session) {
@@ -50,6 +50,22 @@ output$dataOutput <- renderDataTable({
   }
 })
 
+#### tab 3 ####
+
+
+## boxplot and scatterplot
+output$trialPlots <- renderPlot({"trailPlots"
+#reactive({
+  if (input$plotChoice =="Box Plot"){
+     ggplot(data = myBatting, aes(x = lgID, y = HR, fill = lgID)) + geom_boxplot() + geom_jitter()
+    
+  } else{
+  ggplot(data = myBatting, aes(x = G, y = HR)) + geom_point() + geom_smooth(method = lm, col = "red")
+  
+  }
+ 
+#})
+})
 
 
 

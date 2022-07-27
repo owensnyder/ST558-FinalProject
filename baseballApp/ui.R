@@ -103,19 +103,25 @@ column(8,box(width = 50,
 ),
 
 ## third tab: data exploration
+
+## need to filter data for each summary and plot though...
+
+
+
 tabItem(tabName = "Tab3",
 fluidRow(
-  
+  #plotOutput(
 box(width = 10,
     h4("You can change the type of plots below:"),
     radioButtons(inputId = "plotChoice",
     label = "",
     choices = c("Box Plot", "Scaterplot"),
-    selected = "Box plot")
+    selected = "Box Plot"),
+    plotOutput("trialPlots")
 )
   
 )
-
+#)
 )
 
 
