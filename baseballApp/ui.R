@@ -2,9 +2,14 @@
 ## load packages
 library(shiny)
 library(shinydashboard)
+library(dashboardthemes)
 library(DT)
 library(ggplot2)
 library(Lahman)
+library(tidyverse)
+
+
+myBatting <- Batting %>% filter(yearID >= "2009") # & AB > 200)
 
 dashboardPage(skin = "blue",
 
@@ -75,7 +80,7 @@ column(5,
   h4("Try selecting some variables of your choice! (multiple choices allowed)"),
     selectInput(inputId = "variables",
     label = "Choose variables to include (can't ignore first 5 categorical variables)",
-      choices = names(Batting)[-c(1:5)], multiple = TRUE)
+      choices = names(myBatting)[-c(1:5)], multiple = TRUE)
 ),
 
 ## create a download button
@@ -110,18 +115,47 @@ column(8,box(width = 50,
 
 tabItem(tabName = "Tab3",
 fluidRow(
-  #plotOutput(
-box(width = 10,
-    h4("You can change the type of plots below:"),
-    radioButtons(inputId = "plotChoice",
-    label = "",
-    choices = c("Box Plot", "Scaterplot"),
-    selected = "Box Plot"),
-    plotOutput("trialPlots")
-)
+    box(width = 5,
+      h4("You can filter the data by popular players"),
+      selectInput(inputId = "playerDataSelect",
+                  label = "defualts to All data in given time frame (i.e the years I decided on)",
+                  choices = c("All Players", "Aaron Judge", "Jose Altuve", "Juan Soto", "Mookie Betts"),
+                  multiple = FALSE
+      )
+  ),
   
+  # Select Variables
+  box(width = 12,
+      h4("Select a variable to change the plots and summaries!"),
+      selectInput(inputId = "playerVars",
+                  label = "Choose variables to summarize:",
+                  choices = names(myBatting)[-c(1:5)], multiple = FALSE
+      )
+  ),
+  
+  ## UI for summary stats 
+  column(width = 9,
+         br(),
+         h4("Numerical Summary for Given Statistic:"),
+         box(width = 15,
+             skin="black",
+             tableOutput("dataTable"))),
+  
+  ## UI for plot choice
+    box(width = 10,
+      h4("You can change the type of plots below:"),
+      radioButtons(inputId = "plotChoice",
+      label = "",
+      choices = c("Box Plot", "Scaterplot"),
+      selected = "Box Plot"),
+        plotOutput("trialPlots")
 )
-#)
+
+
+
+
+)
+
 )
 
 

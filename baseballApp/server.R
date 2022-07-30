@@ -5,10 +5,11 @@ library(ggplot2)
 library(tidyverse)
 library(caret)
 library(Lahman)
+library(dashboardthemes)
 
 
 ## this will be used for melding, maybe for everything??
-myBatting <- Batting %>% filter(yearID > "2020" & AB > 200)
+myBatting <- Batting %>% filter(yearID > 2012 & yearID < 2018) %>% filter(HR > 5 & AB > 200)
 
 shinyServer(function(input, output, session) {
   
@@ -52,25 +53,75 @@ output$dataOutput <- renderDataTable({
 
 #### tab 3 ####
 
+#tab3data <- reactive({
+ # if ("G" %in% input$variables) return(batting$G)
 
-## boxplot and scatterplot
-output$trialPlots <- renderPlot({"trailPlots"
-#reactive({
-  if (input$plotChoice =="Box Plot"){
-     ggplot(data = myBatting, aes(x = lgID, y = HR, fill = lgID)) + geom_boxplot() + geom_jitter()
+ ## create a reactable new data set for plots and summaries 
+
+
+Inputdata <- reactive({
+  if(input$playerDataSelect == "All Players"){
+    return(myBatting %>% select(lgID, HR,input$playerVars))
     
-  } else{
-  ggplot(data = myBatting, aes(x = G, y = HR)) + geom_point() + geom_smooth(method = lm, col = "red")
-  
+  } else if (input$playerDataSelect=="Aaron Judge"){
+    otherPlayers1 <- myBatting %>%
+      filter(playerID == "judgeaa01") %>% select(lgID,HR,input$playerVars)
+    return(otherPlayers1)
+    
+  } else if(input$playerDataSelect=="Jose Altuve"){
+    otherPlayers2 <- myBatting %>%
+      filter(playerID == "altuvjo01") %>% select(lgID,HR,input$playerVars)
+    return(otherPlayers2)
+    
+  }else if(input$playerDataSelect=="Juan Soto"){
+    otherPlayers3 <- myBatting %>%
+      filter(playerID == "sotoju01") %>% select(lgID,HR,input$playerVars)
+    return(otherPlayers3)
+    
   }
- 
+  
+})
+
+
+# Create summary table
+## this works!!
+output$dataTable <- renderTable({
+  setStat <- quo(!!sym(input$playerVars))  
+  summaryStat <- Inputdata() %>%
+    select(!!setStat) %>%
+    summarise(Min = min(!!setStat),  Mean = mean(!!setStat, na.rm=T),
+            Max = max(!!setStat))
+  summaryStat
+})
+
+#output$table_tag3 <- reactive({
+#  summary(!!sym(input$playerVars))
 #})
+
+
+
+
+
+Outputplot <- reactive({
+  if (input$plotChoice=="Box Plot"){
+    plotCycle <- ggplot(data = Inputdata(), aes(x = lgID, y = Inputdata()[,input$playerVars], fill = lgID)) +
+      geom_boxplot() + geom_jitter()
+    
+  } else {
+    plotCycle <- ggplot(data = Inputdata(), aes(x = HR, y = Inputdata()[,input$playerVars])) + 
+      geom_point() + geom_smooth(method = "lm")
+  }
+  return(plotCycle)
 })
 
 
 
 
+
+# Output the plot
+output$trialPlots <- renderPlot({
+  Outputplot()
+  })
+
 })
-
-
 
