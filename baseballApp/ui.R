@@ -9,9 +9,10 @@ library(Lahman)
 library(tidyverse)
 
 
+
 myBatting <- Batting %>% filter(yearID >= "2009") # & AB > 200)
 
-dashboardPage(skin = "blue",
+dashboardPage(skin="blue",
 
 ## title for app
 dashboardHeader(title = "Modeling Baseball Data with R", titleWidth = 700),
@@ -70,8 +71,12 @@ column(6,
   h4("You can subset the data by players below:"),
     selectInput(inputId = "players",
     label = "Choose a player or all the players to view",
-      choices = c("All Players", "Aaron Judge", "Jose Altuve", 
-                  "Juan Soto",  "Mookie Betts")
+      choices = c("All Players", 
+                  "Giancarlo Stanton", 
+                  "Jose Altuve", 
+                  "Nelson Cruz",  
+                  "Mookie Betts",
+                  "Bryce Harper")
 )),
 
 
@@ -92,7 +97,7 @@ dataTableOutput("dataOutput"),
 
 
 # Provide variables explanation
-column(8,box(width = 50,
+column(8,box(width = 16,
   h6("playerID: unique player ID number."),
   h6("yearID: year the data is from"),
   h6("stint: stint of time"),
@@ -101,8 +106,8 @@ column(8,box(width = 50,
   h6("G: number of games."),
   h6("AB: number of at bats"), height = 300
 )
-),
-
+)
+#,
 
 ## end of tab2
 ),
@@ -119,7 +124,12 @@ fluidRow(
       h4("You can filter the data by popular players"),
       selectInput(inputId = "playerDataSelect",
                   label = "defualts to All data in given time frame (i.e the years I decided on)",
-                  choices = c("All Players", "Aaron Judge", "Jose Altuve", "Juan Soto", "Mookie Betts"),
+                  choices = c("All Players", 
+                              "Giancarlo Stanton", 
+                              "Jose Altuve", 
+                              "Nelson Cruz",  
+                              "Mookie Betts",
+                              "Bryce Harper"),
                   multiple = FALSE
       )
   ),
@@ -148,16 +158,155 @@ fluidRow(
       label = "",
       choices = c("Box Plot", "Scaterplot"),
       selected = "Box Plot"),
-        plotOutput("trialPlots")
-)
+        plotOutput("trialPlots"))
 
 
 
 
 )
 
-)
+), ## end tab 3
 
+tabItem((tabName = "Tab4"),
+        tabsetPanel(
+          tabPanel("Modeling Info",
+                   #fluidRow(
+                            h1("Linear Regression"),
+                            box(width = 12,
+                            h4("Linear regression accomplishes this by learning a model that best fits the 
+                                 linear relationship between the predictor and response variables.
+                                 The model is fit by minimizing the sum of squared residuals (difference between 
+                                 the observed and predicted responses).")
+                            
+                            #h1("Regression Tree"),
+                           # box(width = 12,
+                              #  h4("text goes here"))
+        
+        ), # end box 1
+        h1("Reg Tree"),
+        box(width = 12,
+            h4("text goes here")),
+        
+        h1("Random Forest"),
+        box(width = 12,
+            h4("text goes here"))
+        ),
+        ## start model fitting tab 
+        tabPanel("Model Fitting",
+                 fluidRow(
+          column(width = 4,
+                 box(width = 12, background = "aqua",
+                     sliderInput("splitSize", "What percent of the training/test set do you want?",
+                                 min = 0.10, max = 1.0, value = 0.80, step = 0.10))),
+          
+          box(width = 12, h3("The Response Variable"),
+                            h4("NOTE: the default response variable is Home Runs, however, 
+                               the user will be able to pick which predictor variables they want to use."),
+              h5("This reponse variable of Home Runs will be used across all three models.")),
+          
+          box(width = 12,
+              selectInput(inputId = 'respVar',
+                          label = "Select response variable",
+                          choices = c("HR")
+              )
+          ),
+          
+          box(width = 12,
+              selectInput(inputId = 'predVars',
+                          label = "Please select variables for all models (multiple choices):",
+                          choices = c("G", "AB","X2B","X3B","RBI","SB","BB","SO","IBB",
+                                      "HBP","SF", "GIDP"), multiple = TRUE
+              ),
+              h6("The slections defualt to all variables. Note that this may take longer to
+                 build models opposed to using fewer variables.")
+          ),
+          ## create the run button
+          box(width = 12,
+              h3("Click the button to run all three models"),
+              actionButton("runModelButton", "Click Here!"),
+                 ),
+         column(width = 9,
+                br(),
+                
+                
+                # Summary
+                box(width = 12,
+                    column(10,
+                           strong(h4("Summary for Multiple Linear Regression")),
+                           verbatimTextOutput("mlrSummary"))),
+                    box(width = 12,
+                    column(10,
+                           strong(h4("Summary for Regression Tree")),
+                           verbatimTextOutput("regTreeSummary"))),
+                    box(width = 12,
+                    column(10,
+                           h4("Summary for Random Forest"),
+                           verbatimTextOutput("rfSummary"))
+                    ),
+                box(width = 12,
+                    column(10, h4("Fit Statistics: RMSE"),
+                           tableOutput("RMSE")))
+               # )
 
+))),
+tabPanel("Prediction",
+         fluidRow(
+           column(4, 
+                  box(width = 12,
+                      title = "Enter values for variables that will predict Home Runs",
+                      numericInput(inputId = "predGames",
+                                   label = "Number of Games (49-162)",
+                                   value = 162,
+                                   min = 49, max = 162),
+                      numericInput(inputId = "predAB",
+                                   label = "Number of At Bats (201-684)",
+                                   value = 300,
+                                   min = 201, max = 684),
+                      numericInput(inputId = "predX2B",
+                                   label = "Number of Doubles (5-56)",
+                                   value = 25,
+                                   min = 5, max = 56),
+                      numericInput(inputId = "predX3B",
+                                   label = "Number of Triples (0-15)",
+                                   value = 3,
+                                   min = 0, max = 15),
+                      numericInput(inputId = "predRBI",
+                                   label = "Number of RBIs (15-138)",
+                                   value = 100,
+                                   min = 15, max = 138),
+                      numericInput(inputId = "predSB",
+                                   label = "Number of Stolen Bases (0-62)",
+                                   value = 25,
+                                   min = 0, max = 62),
+                      numericInput(inputId = "predBB",
+                                   label = "Number of Walks (5-143)",
+                                   value = 80,
+                                   min = 5, max = 143),
+                      numericInput(inputId = "predSO",
+                                   label = "Number of Strikeouts (26-219)",
+                                   value = 125,
+                                   min = 26, max = 219),
+                      numericInput(inputId = "predIBB",
+                                   label = "Number of Intentional Walks (0-29)",
+                                   value = 8,
+                                   min = 0, max = 29),
+                      numericInput(inputId = "predHBP",
+                                   label = "Number of Hit by Pitch (0-30)",
+                                   value = 15,
+                                   min = 0, max = 30),
+                      numericInput(inputId = "predSF",
+                                   label = "Number of Sacrifice Flies (0-15)",
+                                   value = 5,
+                                   min = 0, max = 15),
+                      numericInput(inputId = "predGIDP",
+                                   label = "Number of Grounded into Double Plays (0-31)",
+                                   value = 14,
+                                   min = 0, max = 31)
+                      ),
+                  column(8,
+                         box(width = 10, background = "blue",
+                             h3("Prediction for Home Runs (HR)"),
+                             tableOutput(outputId = "predValsTable")))
+         ))
 
-                  )))
+))))))## top parens 
