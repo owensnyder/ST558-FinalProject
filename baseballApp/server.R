@@ -150,10 +150,10 @@ myFormula.mlr <- reactive({
     return(formula(paste0(input$respVar,'~','(G + AB + X2B + X3B + RBI + SB + BB + SO + IBB + HBP + SF + GIDP)^2')))
   } else{
     n <- length(input$predVars)
-    temp <- paste0(input$predVars,c(rep("+", n-1), ""))
-    temp <- paste0(temp, collapse = "")
+    formulaBuild1 <- paste0(input$predVars,c(rep("+", n-1), ""))
+    formulaBuild1 <- paste0(formulaBuild1, collapse = "")
     #temp <- paste0(temp^2)
-    return(formula(paste0(input$respVar, '~', temp)))
+    return(formula(paste0(input$respVar, '~', formulaBuild1)))
   }
 })
 
@@ -163,7 +163,7 @@ myFormula <- reactive({
   } else{
     n <- length(input$predVars)
     formulaBuild <- paste0(input$predVars,c(rep("+", n-1), ""))
-    forumulaBuild <- paste0(temp, collapse = "")
+    forumulaBuild <- paste0(formulaBuild, collapse = "")
     #temp <- paste0(temp^2)
     return(formula(paste0(input$respVar, '~', forumulaBuild)))
   }

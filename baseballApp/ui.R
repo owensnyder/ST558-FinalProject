@@ -171,26 +171,55 @@ tabItem((tabName = "Tab4"),
         tabsetPanel(
           tabPanel("Modeling Info",
                    #fluidRow(
-                            h1("Linear Regression"),
+                            h1(" Multiple Linear Regression"),
                             box(width = 12,
-                            h4("Linear regression accomplishes this by learning a model that best fits the 
-                                 linear relationship between the predictor and response variables.
-                                 The model is fit by minimizing the sum of squared residuals (difference between 
-                                 the observed and predicted responses).")
+                            h4("Multiple Linear Regression (MLR) is another supervised learning method and is an extension of Simple Linear Regression (SLR). We can expand MLR in many ways. For example, one might want to include many more variables than you would in SLR while including higher order terms. The goal is to model a relationship between two or more predictor variables and a response variable. Below is an example of a MLR model with two predictor variables."),
+                            h4(withMathJax(helpText("$$Y_i=\\beta_0+\\beta_1x_{1i}+\\beta_2x_{2i}+\\beta_3x_{1i}x_{2i}  +...+ E_i$$"))),
+                            h4(strong("Benefits:")),
+                            h4("There are many benefits to MLR. For example, MLR is very simple to understand compared to other complex models. When looking at an output, we will be able to clearly undertsand the influence that interactions have on each other. Furthermore, because MLR is generally simple, efficiency/computation time is not usually compromised with these models. Also, we tend to have an easier time using predictions for MLR models."),
+                            h4(strong("Drawbacks:")),
+                            h4("While MLR has many advantages, there are some disadvantages that must be acknowledged. First, there are many assumptions that need to be met/assumed. Also, MLR is looking at linear relationships between the response and predictor variables, which may not be optimal all of the time. For example, there may be instaces where our variables could be better fit by different methods and the MLR model fails to provide a good fit.")
                             
                             #h1("Regression Tree"),
                            # box(width = 12,
                               #  h4("text goes here"))
         
         ), # end box 1
-        h1("Reg Tree"),
+        h1("Regression Tree"),
         box(width = 12,
-            h4("text goes here")),
+            h4("Regression Trees are one of the many tree-based methods that live in the world of supervised learning. We use a Regression Tree when our goal is to predict a continous response. This is different to its counterpart, Classification Trees where you want to classify(predict) group memebership. Futhermore, for a given region we usually use the mean of the observations as predictiosn. Now, the main process for Regression Trees goes something like this:"),
+            h4("(1) Pick the splits by using recursive binary  splitting. But note that this is a 
+               very tedious and 'greedy' algorithm. Then, for every possible value of each predictor we find the Residual Sum of Squares and try to minimize it. Thus,"),
+            h4(withMathJax(helpText("$$R_1(j,s) = {{x|x_j < s}} , R_2(j,s) = {{x|x_j \\ge s}}$$"))),
+            h4("(2) Then, once your split is chosen, you repeat the same process for the second split."),
+            h4("(3) You then want to grow a large tree, i.e. a tree with many nodes"),
+            h4("(4) Then you will prune the tree using 'cost-complexity pruning'. This is done so that we do not overfit the data!"),
+            h4(strong("Benefits:")),
+            h4("Now, there are many benefits to using Regression Tree, or trees in general. First, they are very easy to understand and interpret the output. Plots in the form of tree plots can really help with this. Also, predictors do not need to be scaled, no statistical assumptions are necessary, and we have built-in variable selection."),
+            h4(strong("Drawbacks:")),
+            h4("However, we do experience some drawbacks when working with trees. For exmaple, small changes in our data at hand can have a big affect on the output/tree. And, unfortunately, the algorithms can be computationally intensive and we usually need to prune the trees")
+            
+            ),
         
         h1("Random Forest"),
         box(width = 12,
-            h4("text goes here"))
-        ),
+            h4("Finally, we will discuss Random Forests. This method actually uses some of the same ideas as Bagging which requires Bootstrapping. So what is Bootstrapping? This method is used throuough statistics and is when we either resample from the data (non-parametric method) or from a fitted model (parametric method)."),
+            h4("Now, we will use Random Forest (and the other tree-based methods) when prediction is more important that interpretation. In fact, we will be able to average across the fitted trees and decrease the variance for an individual tree fit."),
+            h4("Thus, for Random Forests, we will create multiple trees from bootstrapped samples and avergae the results. It is important to note that a kewy difference of the Random Forest method is that we do not use all of the predictors and we use a random subset of predictors for each bootstrap sample."),
+            h4("Now, for predictors, we are going to usually use this method for Classification Trees:"),
+            h4(withMathJax(helpText("$$ m = \\sqrt{p}$$"))),
+            h4("And use this method for Regression Trees:"),
+            h4(withMathJax(helpText("$$ m = p/3$$"))),
+            h4("Also to note, if we have:"),
+            h4(withMathJax(helpText("$$ m = p$$"))),
+            h4("then we have bagging."),
+            h4(strong("Benefits:")),
+            h4("Now, as mentioned above, the greatest aspect of Random Forests is that we greeatly 
+               improve on prediction."),
+            h4(strong("Drawbacks:")),
+            h4("On the other hand, we lose intepretability when using Random Forest models.")
+            
+        )),
         ## start model fitting tab 
         tabPanel("Model Fitting",
                  fluidRow(
