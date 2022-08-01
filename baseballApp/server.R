@@ -9,7 +9,7 @@ library(dashboardthemes)
 
 
 
-## this will be used for melding, maybe for everything??
+## THIS IS THE DATA!!!
 myBatting <- Batting %>% filter(yearID > 2012 & yearID < 2018) %>% filter(HR > 5 & AB > 200)
 
 shinyServer(function(input, output, session) {
@@ -76,7 +76,7 @@ output$dataOutput <- renderDataTable({
 #output$baseballData<- downloadHandler(
  # filename = "LahmanBaseballData.csv",
  # content = function(file) {
- ##   write.csv(Inputdata(),file, row.names = FALSE)
+ ##   write.csv(file, row.names = FALSE)
  # }
 #)
 
@@ -87,8 +87,8 @@ output$dataOutput <- renderDataTable({
  # if ("G" %in% input$variables) return(batting$G)
 
  ## create a reactable new data set for plots and summaries 
-
-Inputdata <- reactive({
+## this will be for All Years, and years 2013-2017
+subData <- reactive({
   if(input$playerDataSelect == "All Years"){
     return(myBatting %>% select(yearID,lgID, HR,input$playerVars))
     
@@ -123,7 +123,7 @@ Inputdata <- reactive({
 
 output$dataTable <- renderTable({
   setStat <- quo(!!sym(input$playerVars))  
-  summaryStat <- Inputdata() %>%
+  summaryStat <- subData() %>%
     select(!!setStat) %>%
     summarise(Minimum = min(!!setStat),  Mean = mean(!!setStat, na.rm=TRUE),
             Maximum = max(!!setStat), StdDeviation = sd(!!setStat))
@@ -132,11 +132,11 @@ output$dataTable <- renderTable({
 
 
 #### putting download button code here ###
-## need Inputdata() to be built first
+## need subData() to be built first
 output$baseballData<- downloadHandler(
   filename = "LahmanBaseballData.csv",
   content = function(file) {
-  write.csv(Inputdata(),file, row.names = FALSE)
+  write.csv(subData(),file, row.names = FALSE)
  }
 )
 
@@ -144,20 +144,21 @@ output$baseballData<- downloadHandler(
 #  summary(!!sym(input$playerVars))
 #})
 
-
+## Create plots
 Outputplot <- reactive({
   if (input$plotChoice=="Box Plot"){
-    plotCycle <- ggplot(data = Inputdata(), aes(x = lgID, y = Inputdata()[,input$playerVars], fill = lgID)) +
+    plotCycle <- ggplot(data = subData(), aes(x = lgID, y = subData()[,input$playerVars], fill = lgID)) +
       geom_boxplot() + geom_jitter() + ggtitle("Boxplot of", input$playerVars) +
       labs(x = "League (AL/NL)", y = input$playerVars)
-    
+    ## scatterplot
   } else if (input$plotChoice=="Scatterplot") {
-    plotCycle <- ggplot(data = Inputdata(), aes(x = HR, y = Inputdata()[,input$playerVars])) + 
+    plotCycle <- ggplot(data = subData(), aes(x = HR, y = subData()[,input$playerVars])) + 
       geom_point(aes(color = yearID)) + geom_smooth(method = "lm", col = "red") + 
       ggtitle("Scatterplot of HR and", input$playerVars) + 
       labs(x = "Home Runs", y = input$playerVars)
+    ## histogram
   } else if (input$plotChoice=="Histogram"){
-    plotCycle <- ggplot(data = Inputdata(), aes(x = Inputdata()[,input$playerVars])) + 
+    plotCycle <- ggplot(data = subData(), aes(x = subData()[,input$playerVars])) + 
       geom_histogram(bins = 25, fill = "lightblue") + 
       ggtitle("Histogram of", input$playerVars) + 
       labs(x = input$playerVars)
@@ -165,20 +166,17 @@ Outputplot <- reactive({
   return(plotCycle)
 })
 
-
-### MAYBVE TAKE OFF THE  GEOM_JITTER IN BOXPLOT?!?!
-
-
 ## output the plots
 output$trialPlots <- renderPlot({
   Outputplot()
   })
 
 
-## tab 4 (modeling) ## 
+######################################## TAB 4 (MODELING) ###############################
 
-# Train/Test data split
-Splitdata <- reactive({
+## Training-Testing data split
+## also make it so that a user can access it via a slider value
+dataSplit <- reactive({
   set.seed(558)
   trainIndex <- createDataPartition(myBatting$HR, p = input$splitSize, list = FALSE)
   myBattingTrain <- myBatting[trainIndex, ]
@@ -214,7 +212,7 @@ myFormula <- reactive({
 
 ## FIT THE MLR MODEL
 mlrFit <- eventReactive(input$runModelButton,{
-fit.mlr <- train(myFormula(), data = Splitdata()[["trainData"]],
+fit.mlr <- train(myFormula(), data = dataSplit()[["trainData"]],
             method = "lm",
             preProcess = c("center", "scale"),
             trControl = trainControl(method = "repeatedcv", number = input$cvFold, repeats = 3))
@@ -223,7 +221,7 @@ return(fit.mlr)
 
 ## FIT THE REGRESSION TREE MODEL 
 regTreeFit <- eventReactive(input$runModelButton,{
-  fit.regTree <- train(myFormula(), data = Splitdata()[["trainData"]], method = "rpart",
+  fit.regTree <- train(myFormula(), data = dataSplit()[["trainData"]], method = "rpart",
         trControl = trainControl(method = "repeatedcv", number = input$cvFold, repeats = 3),
         preProcess = c("center", "scale"),
         tuneGrid = data.frame(cp = seq(0, 0.1, 0.01)))
@@ -232,7 +230,7 @@ regTreeFit <- eventReactive(input$runModelButton,{
 
 ## FIT THE RANDOM FOREST MODEL 
 rndmForest <- eventReactive(input$runModelButton,{
-  fit.rf <- train(myFormula(), data = Splitdata()[["trainData"]], method = "rf",
+  fit.rf <- train(myFormula(), data = dataSplit()[["trainData"]], method = "rf",
                        trControl = trainControl(method = "repeatedcv", number = input$cvFold, repeats = 3),
                        preProcess = c("center", "scale"),
                        tuneGrid = data.frame(mtry = 1:5))
@@ -264,9 +262,9 @@ output$rfSummary <- renderPrint({
 
 ## get RMSE
 #output$RMSE <- renderTable({
- # rmse.mlr <- mlrFit()$results$RMSE
- # rmse.regTree <- regTreeFit()$results$RMSE
-  #rmse.rf <- rndmForest()$results$RMSE
+ # rmsemlr <- mlrFit()$results$RMSE
+ # rmseRegTree <- regTreeFit()$results$RMSE
+  #rmserrf <- rndmForest()$results$RMSE
   
 
 ## now we want to find each minimum RMSE value for each model
@@ -296,7 +294,7 @@ output$rndmForestRMSEoutput <- renderPrint({
 ########## PREDICTION TAB ##########
 
 #allPredvals <- eventReactive(input$predButton, {
- # #newData <- Splitdata()[["testData"]]
+ # #newData <- dataSplit()[["testData"]]
   #Games <- input$predGames
 #  AtBats <- input$predAB
  # Doubles <- input$predX2B
@@ -315,7 +313,7 @@ output$rndmForestRMSEoutput <- renderPrint({
 
 ## establish predictor variables in terms of the test data set 
 output$HRpredictions <- eventReactive(input$predButton,{
-  predData <- Splitdata()[["testData"]]
+  predData <- dataSplit()[["testData"]]
   predData$G <- input$predGames
   predData$AB <- input$predAB
   predData$X2B <- input$predX2B
