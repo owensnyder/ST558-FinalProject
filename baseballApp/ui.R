@@ -19,9 +19,9 @@ dashboardHeader(title = "Modeling Baseball Data with R", titleWidth = 700),
 ## create UI tabs
 dashboardSidebar(sidebarMenu(
   menuItem("About", tabName = "Tab1"),
-  menuItem("Data", tabName = "Tab2"),
-  menuItem("Data Exploration and Summaries", tabName = "Tab3"),
-  menuItem("Modeling", tabName = "Tab4")
+  menuItem("Data Exploration and Summaries", tabName = "Tab2"),
+  menuItem("Modeling", tabName = "Tab3"),
+  menuItem("Data", tabName = "Tab4")
               )),
 ## dashboardBody() to create each tab or body element 
 dashboardBody(
@@ -30,8 +30,8 @@ tabItems(
 ## start Tab1 ##
 tabItem(tabName = "Tab1",
   column(4,
-  h1("Brief Introduction"),
-## box 1
+ h1("Brief Introduction"),
+ ## box 1
   box(width=12,
     h4("This app will look at some of the best and most popular Major League Baseball (MLB) 
        players during the 2021 season. If you navigate through the tabs, you will be able to 
@@ -39,7 +39,7 @@ tabItem(tabName = "Tab1",
        page where you will be able to filter the data and save it if you please. note: filtering data"))),
 
 ## box 2
-  column(4,
+ column(4,
     h1("The Data"),
     box(width = 12,
     h4("The data I used comes from the Lahman database. There are many different datasets within this 
@@ -64,7 +64,11 @@ tabItem(tabName = "Tab1",
 ),
                   
 #### start tab 2 ####
-tabItem(tabName = "Tab2",
+
+## NOTE ##
+## i realize this tab should be at the bottom, however I built the app layout with a Data page before everything
+## because i thought it made more sense. But i eneded up changing the tab name numbers around
+tabItem(tabName = "Tab4",
 
 ## choose a baseball players from the list
 column(6,
@@ -118,7 +122,7 @@ column(8,box(width = 16,
 
 
 
-tabItem(tabName = "Tab3",
+tabItem(tabName = "Tab2",
 fluidRow(
     box(width = 5,
       h4("You can filter the data by popular players"),
@@ -167,7 +171,7 @@ fluidRow(
 
 ), ## end tab 3
 
-tabItem((tabName = "Tab4"),
+tabItem((tabName = "Tab3"),
         tabsetPanel(
           tabPanel("Modeling Info",
                    #fluidRow(
@@ -367,4 +371,8 @@ tabPanel("Prediction",
                          verbatimTextOutput("HRpredictions")))
 ))
 
-)))))## top parens 
+))
+
+
+
+)))## top parens 

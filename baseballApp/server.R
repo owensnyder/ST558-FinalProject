@@ -98,17 +98,14 @@ output$dataTable <- renderTable({
   setStat <- quo(!!sym(input$playerVars))  
   summaryStat <- Inputdata() %>%
     select(!!setStat) %>%
-    summarise(Min = min(!!setStat),  Mean = mean(!!setStat, na.rm=TRUE),
-            Max = max(!!setStat), Correlation=cor(HR, !!setStat))
+    summarise(Minimum = min(!!setStat),  Mean = mean(!!setStat, na.rm=TRUE),
+            Maximum = max(!!setStat))
   summaryStat
 })
 
 #output$table_tag3 <- reactive({
 #  summary(!!sym(input$playerVars))
 #})
-
-
-
 
 
 Outputplot <- reactive({
