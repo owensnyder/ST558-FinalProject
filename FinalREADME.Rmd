@@ -1,0 +1,18 @@
+---
+title: "FinalREADME"
+author: "Owen Snyder"
+date: '2022-08-01'
+output: github_document
+---
+
+
+create Readme
+
+```{r eval=FALSE}
+rmarkdown::render("FinalREADME.Rmd",
+                  output_format = "github_document",
+                  output_file = "README.md",
+                  output_options = list(
+                    html_preview = FALSE, toc = TRUE, toc_depth = 2, toc_float = TRUE)
+)
+```
