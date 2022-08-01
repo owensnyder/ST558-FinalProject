@@ -151,11 +151,16 @@ Outputplot <- reactive({
       geom_boxplot() + geom_jitter() + ggtitle("Boxplot of", input$playerVars) +
       labs(x = "League (AL/NL)", y = input$playerVars)
     
-  } else {
+  } else if (input$plotChoice=="Scatterplot") {
     plotCycle <- ggplot(data = Inputdata(), aes(x = HR, y = Inputdata()[,input$playerVars])) + 
       geom_point(aes(color = yearID)) + geom_smooth(method = "lm", col = "red") + 
       ggtitle("Scatterplot of HR and", input$playerVars) + 
       labs(x = "Home Runs", y = input$playerVars)
+  } else if (input$plotChoice=="Histogram"){
+    plotCycle <- ggplot(data = Inputdata(), aes(x = Inputdata()[,input$playerVars])) + 
+      geom_histogram(bins = 25, fill = "lightblue") + 
+      ggtitle("Histogram of", input$playerVars) + 
+      labs(x = input$playerVars)
   }
   return(plotCycle)
 })

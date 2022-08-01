@@ -69,7 +69,7 @@ imageOutput(outputId = "MLBpicture")
 
 ## NOTE ##
 ## i realize this tab should be at the bottom, however I built the app layout with a Data page before everything
-## because i thought it made more sense. But i eneded up changing the tab name numbers around
+## because i thought it made more sense. But i ended up changing the tab name numbers around
 tabItem(tabName = "Tab4",
 
 ## choose a baseball players from the list
@@ -162,7 +162,7 @@ fluidRow(
       h4("You can change the type of plots below:"),
       radioButtons(inputId = "plotChoice",
       label = "",
-      choices = c("Box Plot", "Scaterplot"),
+      choices = c("Box Plot", "Scatterplot", "Histogram"),
       selected = "Box Plot"),
         plotOutput("trialPlots"))
 
