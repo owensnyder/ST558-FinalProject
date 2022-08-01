@@ -93,7 +93,7 @@ downloadButton(outputId = "baseballData", label = "Download the data!"),
 
 # Show the data frame
 dataTableOutput("dataOutput"),
-  h3("Breif explanation of variables"),
+  h3("Brief explanation of variables"),
 
 
 # Provide variables explanation
@@ -180,9 +180,7 @@ tabItem((tabName = "Tab4"),
                             h4(strong("Drawbacks:")),
                             h4("While MLR has many advantages, there are some disadvantages that must be acknowledged. First, there are many assumptions that need to be met/assumed. Also, MLR is looking at linear relationships between the response and predictor variables, which may not be optimal all of the time. For example, there may be instaces where our variables could be better fit by different methods and the MLR model fails to provide a good fit.")
                             
-                            #h1("Regression Tree"),
-                           # box(width = 12,
-                              #  h4("text goes here"))
+                      
         
         ), # end box 1
         h1("Regression Tree"),
@@ -224,7 +222,7 @@ tabItem((tabName = "Tab4"),
         tabPanel("Model Fitting",
                  fluidRow(
           column(width = 4,
-                 box(width = 12, background = "aqua",
+                 box(width = 12, background = "blue",
                      sliderInput("splitSize", "What percent of the training/test set do you want?",
                                  min = 0.10, max = 1.0, value = 0.80, step = 0.10))),
           
@@ -254,15 +252,15 @@ tabItem((tabName = "Tab4"),
               h3("Click the button to run all three models"),
               actionButton("runModelButton", "Click Here!"),
                  ),
-         column(width = 9,
-                br(),
+         #column(width = 9,
+               # br(),
                 
                 
                 # Summary
                 box(width = 12,
                     column(10,
                            strong(h4("Summary for Multiple Linear Regression")),
-                           verbatimTextOutput("mlrSummary"))),
+                          verbatimTextOutput("mlrSummary"))),
                     box(width = 12,
                     column(10,
                            strong(h4("Summary for Regression Tree")),
@@ -272,15 +270,46 @@ tabItem((tabName = "Tab4"),
                            h4("Summary for Random Forest"),
                            verbatimTextOutput("rfSummary"))
                     ),
-                box(width = 12,
-                    column(10, h4("Fit Statistics: RMSE"),
-                           tableOutput("RMSE")))
-               # )
-
-))),
+               
+               
+               column(9, 
+                      box(width = 12,
+                          h3("RMSE on Training Data"),
+                          h5("Below, you will find the minimum RMSE output for each model that you built. 
+                             The minimum was taken for each respective model RMSE output and the 
+                             best model will be dtermined by the lowest RMSE of these three below. "),
+                          tableOutput(outputId = "rmse_training_all_model")),
+                      box(width = 12, solidHeader = TRUE,
+                          title = "Training Data Outputs",
+                          h4(strong("Multiple Linear Regression")),
+                          verbatimTextOutput("mlrRMSEoutput"),
+                          h4(strong("Regression Tree")),
+                          verbatimTextOutput("regTreeRMSEoutput"),
+                          h4(strong("Random Forest")),
+                          verbatimTextOutput("rndmForestRMSEoutput")))
+               
+               
+)),
 tabPanel("Prediction",
          fluidRow(
-           column(4, 
+           column(4,
+                  br(),
+                  
+                  ## select model for Prediction
+                  box(width = 12,
+                      h4("Click a button to chose a model!"),
+                      radioButtons(inputId = "chooseModel",
+                                   label = "",
+                                   choices = c("Multiple Linear Regression", "Regression Tree", "Random Forest"),
+                                   selected = "Multiple Linear Regression")
+                  ),
+                  ## create another button for predictions
+                  box(width = 12,
+                      h4("Click the button to predict!"),
+                      actionButton("predButton", "Click Here!!")
+                  ),
+                  ## now we want to set up our variables for prediction
+                  ## note the ranges for each variable
                   box(width = 12,
                       title = "Enter values for variables that will predict Home Runs",
                       numericInput(inputId = "predGames",
@@ -332,10 +361,10 @@ tabPanel("Prediction",
                                    value = 14,
                                    min = 0, max = 31)
                       ),
-                  column(8,
-                         box(width = 10, background = "blue",
-                             h3("Prediction for Home Runs (HR)"),
-                             tableOutput(outputId = "predValsTable")))
-         ))
 
-))))))## top parens 
+                  column(width = 9,
+                         h3("The predicted number of Home Runs is:"),
+                         verbatimTextOutput("HRpredictions")))
+))
+
+)))))## top parens 

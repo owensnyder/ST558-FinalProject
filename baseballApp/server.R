@@ -63,31 +63,31 @@ output$dataOutput <- renderDataTable({
 
 Inputdata <- reactive({
   if(input$playerDataSelect == "All Players"){
-    return(myBatting %>% select(lgID, HR,input$playerVars))
+    return(myBatting %>% select(yearID,lgID, HR,input$playerVars))
     
   } else if (input$playerDataSelect=="Nelson Cruz"){
     otherPlayers1 <- myBatting %>%
-      filter(playerID == "cruzne02") %>% select(lgID,HR,input$playerVars)
+      filter(playerID == "cruzne02") %>% select(yearID,lgID,HR,input$playerVars)
     return(otherPlayers1)
     
   } else if(input$playerDataSelect=="Jose Altuve"){
     otherPlayers2 <- myBatting %>%
-      filter(playerID == "altuvjo01") %>% select(lgID,HR,input$playerVars)
+      filter(playerID == "altuvjo01") %>% select(yearID,lgID,HR,input$playerVars)
     return(otherPlayers2)
     
   }else if(input$playerDataSelect=="Giancarlo Stanton"){
     otherPlayers3 <- myBatting %>%
-      filter(playerID == "stantmi03") %>% select(lgID,HR,input$playerVars)
+      filter(playerID == "stantmi03") %>% select(yearID,lgID,HR,input$playerVars)
     return(otherPlayers3)
     
   }else if(input$playerDataSelect=="Bryce Harper"){
     otherPlayers4 <- myBatting %>%
-      filter(playerID == "harpebr03") %>% select(lgID,HR,input$playerVars)
+      filter(playerID == "harpebr03") %>% select(yearID,lgID,HR,input$playerVars)
     return(otherPlayers4)
     
   }else if(input$playerDataSelect=="Mookie Betts"){
     otherPlayers5 <- myBatting %>%
-      filter(playerID == "bettsmo01") %>% select(lgID,HR,input$playerVars)
+      filter(playerID == "bettsmo01") %>% select(yearID,lgID,HR,input$playerVars)
     return(otherPlayers5)
   }
 })
@@ -114,11 +114,14 @@ output$dataTable <- renderTable({
 Outputplot <- reactive({
   if (input$plotChoice=="Box Plot"){
     plotCycle <- ggplot(data = Inputdata(), aes(x = lgID, y = Inputdata()[,input$playerVars], fill = lgID)) +
-      geom_boxplot() + geom_jitter()
+      geom_boxplot() + geom_jitter() + ggtitle("Boxplot of", input$playerVars) +
+      labs(x = "League (AL/NL)", y = input$playerVars)
     
   } else {
     plotCycle <- ggplot(data = Inputdata(), aes(x = HR, y = Inputdata()[,input$playerVars])) + 
-      geom_point() + geom_smooth(method = "lm")
+      geom_point(aes(color = yearID)) + geom_smooth(method = "lm", col = "red") + 
+      ggtitle("Scatterplot of HR and", input$playerVars) + 
+      labs(x = "Home Runs", y = input$playerVars)
   }
   return(plotCycle)
 })
@@ -220,15 +223,93 @@ output$rfSummary <- renderPrint({
 })
 
 ## get RMSE
-output$RMSE <- renderTable({
-  rmse.mlr <- mlrFit()$results$RMSE
-  rmse.regTree <- regTreeFit()$results$RMSE
-  rmse.rf <- rndmForest()$results$RMSE
+#output$RMSE <- renderTable({
+ # rmse.mlr <- mlrFit()$results$RMSE
+ # rmse.regTree <- regTreeFit()$results$RMSE
+  #rmse.rf <- rndmForest()$results$RMSE
   
-  cleanUp <- data.frame(RMSE = rep(NA,3))
-  return(cleanUp)
+
+## now we want to find each minimum RMSE value for each model
+## for MLR RMSE
+output$mlrRMSEoutput <- renderPrint({
+  mlrFit <- mlrFit()
+  mlrRMSE <- mlrFit()$results["RMSE"] %>% min() %>% as.data.frame()
+  colnames(mlrRMSE) <- "RMSE"
+  return(mlrRMSE)
+})
+## for Reg Tree RMSE
+output$regTreeRMSEoutput <- renderPrint({
+  regTreeFit <- regTreeFit()
+  regtreeRMSE <- regTreeFit()$results["RMSE"] %>% min() %>% as.data.frame()
+  colnames(regtreeRMSE) <- "RMSE"
+  return(regtreeRMSE)
+})
+
+## for Random Forest RMSE
+output$rndmForestRMSEoutput <- renderPrint({
+  rndmForest <- rndmForest()
+  rndmforestRMSE <- rndmForest()$results["RMSE"] %>% min() %>% as.data.frame()
+  colnames(rndmforestRMSE) <- "RMSE"
+  return(rndmforestRMSE)
+})
+
+########## PREDICTION TAB ##########
+
+#allPredvals <- eventReactive(input$predButton, {
+ # #newData <- Splitdata()[["testData"]]
+  #Games <- input$predGames
+#  AtBats <- input$predAB
+ # Doubles <- input$predX2B
+#  Triples <- input$predX3B
+ # RBIs <- input$predRBI
+  #StolenBases <- input$predSB
+  #Walks <- input$predBB
+  #StrikeOuts <- input$predSO
+  #IntentionalWalks <- input$predIBB
+  #HitByPitch <- input$predHBP
+  #SacFly <- input$predSF
+  #GroundedDP <- input$predGIDP
+  
+
+#### this didnt work ^^
+
+## establish predictor variables in terms of the test data set 
+output$HRpredictions <- eventReactive(input$predButton,{
+  predData <- Splitdata()[["testData"]]
+  predData$G <- input$predGames
+  predData$AB <- input$predAB
+  predData$X2B <- input$predX2B
+  predData$X3B <- input$predX3B
+  predData$RBI <- input$predRBI
+  predData$SB <- input$predSO
+  predData$BB <- input$predBB
+  predData$SO <- input$predSO
+  predData$IBB <- input$predIBB
+  predData$HBP <- input$predHBP
+  predData$SF <- input$predSF
+  predData$GIDP <- input$predGIDP
+  
+  ## create if/else for each button to return a prediction
+  ## for MLR
+  if (input$chooseModel=="Multiple Linear Regression"){
+    mlrPrediction <- predict(mlrFit(), newdata = predData)
+    mlrPrediction <- mlrPrediction[1] ## access first element, all we need
+    return(as.numeric(mlrPrediction))}
+  ## for Reg Tree
+   else if (input$chooseModel=="Regression Tree"){
+     regTreePrediction <- predict(regTreeFit(), newdata = predData)
+     regTreePrediction <- regTreePrediction[1]
+      return(as.numeric(regTreePrediction))}
+  ## for Random Forest
+   else if (input$chooseModel=="Random Forest")
+     rndmForestPrediction <-  predict(rndmForest(), newdata = predData)
+     rndmForestPrediction <- rndmForestPrediction[1]
+      return(as.numeric(rndmForestPrediction))
+
 })
 
 
-})
 
+##end
+})
+## so many parens...
