@@ -89,37 +89,37 @@ output$dataOutput <- renderDataTable({
  ## create a reactable new data set for plots and summaries 
 
 Inputdata <- reactive({
-  if(input$playerDataSelect == "All Players"){
+  if(input$playerDataSelect == "All Years"){
     return(myBatting %>% select(yearID,lgID, HR,input$playerVars))
     
-  } else if (input$playerDataSelect=="Nelson Cruz"){
-    otherPlayers1 <- myBatting %>%
-      filter(playerID == "cruzne02") %>% select(yearID,lgID,HR,input$playerVars)
-    return(otherPlayers1)
+  } else if (input$playerDataSelect=="2013"){
+    otherYears1 <- myBatting %>%
+      filter(yearID == "2013") %>% select(yearID,lgID,HR,input$playerVars)
+    return(otherYears1)
     
-  } else if(input$playerDataSelect=="Jose Altuve"){
-    otherPlayers2 <- myBatting %>%
-      filter(playerID == "altuvjo01") %>% select(yearID,lgID,HR,input$playerVars)
-    return(otherPlayers2)
+  } else if(input$playerDataSelect=="2014"){
+    otherYears2 <- myBatting %>%
+      filter(yearID == "2014") %>% select(yearID,lgID,HR,input$playerVars)
+    return(otherYears2)
     
-  }else if(input$playerDataSelect=="Giancarlo Stanton"){
-    otherPlayers3 <- myBatting %>%
-      filter(playerID == "stantmi03") %>% select(yearID,lgID,HR,input$playerVars)
-    return(otherPlayers3)
+  }else if(input$playerDataSelect=="2015"){
+    otherYears3 <- myBatting %>%
+      filter(yearID == "2015") %>% select(yearID,lgID,HR,input$playerVars)
+    return(otherYears3)
     
-  }else if(input$playerDataSelect=="Bryce Harper"){
-    otherPlayers4 <- myBatting %>%
-      filter(playerID == "harpebr03") %>% select(yearID,lgID,HR,input$playerVars)
-    return(otherPlayers4)
+  }else if(input$playerDataSelect=="2016"){
+    otherYears4 <- myBatting %>%
+      filter(yearID == "2016") %>% select(yearID,lgID,HR,input$playerVars)
+    return(otherYears4)
     
-  }else if(input$playerDataSelect=="Mookie Betts"){
-    otherPlayers5 <- myBatting %>%
-      filter(playerID == "bettsmo01") %>% select(yearID,lgID,HR,input$playerVars)
-    return(otherPlayers5)
+  }else if(input$playerDataSelect=="2017"){
+    otherYears5 <- myBatting %>%
+      filter(yearID == "2017") %>% select(yearID,lgID,HR,input$playerVars)
+    return(otherYears5)
   }
 })
 
-# Create summary table
+## Create summary table
 
 output$dataTable <- renderTable({
   setStat <- quo(!!sym(input$playerVars))  
