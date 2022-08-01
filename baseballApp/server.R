@@ -14,7 +14,7 @@ myBatting <- Batting %>% filter(yearID > 2012 & yearID < 2018) %>% filter(HR > 5
 
 shinyServer(function(input, output, session) {
   
-#### tab 1 ####
+######################################## TAB 1 -- About page ######################################
   
 ## create links
   output$cranLink <- renderUI({
@@ -28,8 +28,15 @@ shinyServer(function(input, output, session) {
     tagList("Sean Lahman's offical wesbite", a("can be found here", href="https://www.seanlahman.com/"))
   })
   
+## output MLB image
 
-#### tab 2 ####
+output$MLBpicture <- renderImage({
+   list(src = "../mlbpic.jpeg", width = "300px", height = "300px")
+  }, deleteFile = FALSE)  
+
+  
+  
+############################################## TAB 4 -- Data outputs ########################
 playerChoice <- reactive({
   switch(input$players,
          "All Players" = "All",
@@ -53,23 +60,33 @@ output$dataOutput <- renderDataTable({
   }
 })
 
-#output$dataTable <- renderDataTable()
+#csvData <- renderDataTable({
+ # findPlayer <- playerChoice()
+ # if (findPlayer == "All"){
+ #   myBatting %>% select(playerID, yearID, stint, teamID, lgID, input$variables) %>%
+ #     datatable()
+ # } else{
+ #   myBatting %>%
+ #     filter(playerID==findPlayer) %>% select(playerID, yearID, stint, teamID, lgID, input$variables) %>%
+ #     datatable()
+ # }
+#})
 
-output$baseballData<- downloadHandler(
-  filename = "LahmanBaseballData.csv",
-  content = function(file) {
-    write.csv(findPlayer(), file, row.names = FALSE)
-  }
-)
+
+#output$baseballData<- downloadHandler(
+ # filename = "LahmanBaseballData.csv",
+ # content = function(file) {
+ ##   write.csv(Inputdata(),file, row.names = FALSE)
+ # }
+#)
 
 
-#### tab 3 ####
+########################################## TAB 2 -- Data Exploration  #########################################
 
 #tab3data <- reactive({
  # if ("G" %in% input$variables) return(batting$G)
 
  ## create a reactable new data set for plots and summaries 
-
 
 Inputdata <- reactive({
   if(input$playerDataSelect == "All Players"){
@@ -112,6 +129,16 @@ output$dataTable <- renderTable({
             Maximum = max(!!setStat), StdDeviation = sd(!!setStat))
   summaryStat
 })
+
+
+#### putting download button code here ###
+## need Inputdata() to be built first
+output$baseballData<- downloadHandler(
+  filename = "LahmanBaseballData.csv",
+  content = function(file) {
+  write.csv(Inputdata(),file, row.names = FALSE)
+ }
+)
 
 #output$table_tag3 <- reactive({
 #  summary(!!sym(input$playerVars))

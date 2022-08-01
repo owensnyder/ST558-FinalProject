@@ -10,7 +10,7 @@ library(tidyverse)
 
 
 
-myBatting <- Batting %>% filter(yearID >= "2009") # & AB > 200)
+myBatting <- Batting %>% filter(yearID > 2012 & yearID < 2018) %>% filter(HR > 5 & AB > 200)
 
 dashboardPage(skin="blue",
 
@@ -19,7 +19,7 @@ dashboardHeader(title = "Modeling Baseball Data with R", titleWidth = 700),
 ## create UI tabs
 dashboardSidebar(sidebarMenu(
   menuItem("About", tabName = "Tab1"),
-  menuItem("Data Exploration and Summaries", tabName = "Tab2"),
+  menuItem("Data Exploration", tabName = "Tab2"),
   menuItem("Modeling", tabName = "Tab3"),
   menuItem("Data", tabName = "Tab4")
               )),
@@ -58,8 +58,10 @@ tabItem(tabName = "Tab1",
       h4(uiOutput("seanLahmanLink")))),
                           
 ## Add a baseball picture
-  div(img(src="https://www.google.com/search?q=mlb+image&source=lnms&tbm=isch&sa=X&ved=2ahUKEwiG3IiXwZf5AhXgFlkFHUI4ArgQ_AUoAXoECAEQAw&biw=1423&bih=641&dpr=2#imgrc=iYMO1kZaUs2SwM", 
-        height = '500px'), style="text-align: center;")
+#img(src = "julio-rodriguez.jpeg",align="left", height = "30%", width = "30%")
+imageOutput(outputId = "MLBpicture")
+  #div(img(src="https://www.google.com/search?q=mlb+image&source=lnms&tbm=isch&sa=X&ved=2ahUKEwiG3IiXwZf5AhXgFlkFHUI4ArgQ_AUoAXoECAEQAw&biw=1423&bih=641&dpr=2#imgrc=iYMO1kZaUs2SwM", 
+      #  height = '500px'), style="text-align: center;")
                           
 ),
                   
