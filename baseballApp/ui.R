@@ -226,7 +226,7 @@ tabItem((tabName = "Tab3"),
         tabPanel("Model Fitting",
                  fluidRow(
           column(width = 4,
-                 box(width = 12, background = "blue",
+                 box(width = 12, #background = "blue",
                      sliderInput("splitSize", "What percent of the training/test set do you want?",
                                  min = 0.10, max = 1.0, value = 0.80, step = 0.10))),
           
@@ -251,9 +251,17 @@ tabItem((tabName = "Tab3"),
               h6("The slections defualt to all variables. Note that this may take longer to
                  build models opposed to using fewer variables.")
           ),
+          
+          box(width = 10,
+              h4("All models are run using Repeated Cross Validation. You are able to customize 
+                 how many folds you prefer when building your model."),
+              sliderInput("cvFold", "Select Number of Fold for Cross Validation:",
+                          min = 1, max = 10, value = 5, step = 1)
+          ),
+          
           ## create the run button
           box(width = 12,
-              h3("Click the button to run all three models"),
+              h3("Click the button to run all three models!"),
               actionButton("runModelButton", "Click Here!"),
                  ),
          #column(width = 9,
@@ -263,15 +271,15 @@ tabItem((tabName = "Tab3"),
                 # Summary
                 box(width = 12,
                     column(10,
-                           strong(h4("Summary for Multiple Linear Regression")),
+                           h4(strong("Summary for Multiple Linear Regression")),
                           verbatimTextOutput("mlrSummary"))),
                     box(width = 12,
                     column(10,
-                           strong(h4("Summary for Regression Tree")),
+                           h4(strong("Summary for Regression Tree")),
                            verbatimTextOutput("regTreeSummary"))),
                     box(width = 12,
                     column(10,
-                           h4("Summary for Random Forest"),
+                           h4(strong("Summary for Random Forest")),
                            verbatimTextOutput("rfSummary"))
                     ),
                

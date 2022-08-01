@@ -53,6 +53,16 @@ output$dataOutput <- renderDataTable({
   }
 })
 
+#output$dataTable <- renderDataTable()
+
+output$baseballData<- downloadHandler(
+  filename = "LahmanBaseballData.csv",
+  content = function(file) {
+    write.csv(findPlayer(), file, row.names = FALSE)
+  }
+)
+
+
 #### tab 3 ####
 
 #tab3data <- reactive({
@@ -99,7 +109,7 @@ output$dataTable <- renderTable({
   summaryStat <- Inputdata() %>%
     select(!!setStat) %>%
     summarise(Minimum = min(!!setStat),  Mean = mean(!!setStat, na.rm=TRUE),
-            Maximum = max(!!setStat))
+            Maximum = max(!!setStat), StdDeviation = sd(!!setStat))
   summaryStat
 })
 
@@ -144,7 +154,7 @@ Splitdata <- reactive({
   return(list(trainData=myBattingTrain, testData=myBattingTest))
 })
 
-
+## this is the formula for MLR 
 myFormula.mlr <- reactive({
   if (length(input$predVars)==0){
     return(formula(paste0(input$respVar,'~','(G + AB + X2B + X3B + RBI + SB + BB + SO + IBB + HBP + SF + GIDP)^2')))
@@ -157,6 +167,7 @@ myFormula.mlr <- reactive({
   }
 })
 
+## this formula is used for regression trees and random forests
 myFormula <- reactive({
   if (length(input$predVars)==0){
     return(formula(paste0(input$respVar,'~','G + AB + X2B + X3B + RBI + SB + BB + SO + IBB + HBP + SF + GIDP')))
@@ -174,14 +185,14 @@ mlrFit <- eventReactive(input$runModelButton,{
 fit.mlr <- train(myFormula(), data = Splitdata()[["trainData"]],
             method = "lm",
             preProcess = c("center", "scale"),
-            trControl = trainControl(method = "repeatedcv", number = 5, repeats = 3))
+            trControl = trainControl(method = "repeatedcv", number = input$cvFold, repeats = 3))
 return(fit.mlr)
 })
 
 ## FIT THE REGRESSION TREE MODEL 
 regTreeFit <- eventReactive(input$runModelButton,{
   fit.regTree <- train(myFormula(), data = Splitdata()[["trainData"]], method = "rpart",
-        trControl = trainControl(method = "repeatedcv", number = 5, repeats = 3),
+        trControl = trainControl(method = "repeatedcv", number = input$cvFold, repeats = 3),
         preProcess = c("center", "scale"),
         tuneGrid = data.frame(cp = seq(0, 0.1, 0.01)))
   return(fit.regTree)
@@ -190,7 +201,7 @@ regTreeFit <- eventReactive(input$runModelButton,{
 ## FIT THE RANDOM FOREST MODEL 
 rndmForest <- eventReactive(input$runModelButton,{
   fit.rf <- train(myFormula(), data = Splitdata()[["trainData"]], method = "rf",
-                       trControl = trainControl(method = "repeatedcv", number = 5, repeats = 3),
+                       trControl = trainControl(method = "repeatedcv", number = input$cvFold, repeats = 3),
                        preProcess = c("center", "scale"),
                        tuneGrid = data.frame(mtry = 1:5))
   return(fit.rf)
