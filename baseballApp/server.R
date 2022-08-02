@@ -29,7 +29,6 @@ shinyServer(function(input, output, session) {
   })
   
 ## output MLB image
-
 output$MLBpicture <- renderImage({
    list(src = "../mlbpic.jpeg", width = "350", height = "300")
   }, deleteFile = FALSE)  
@@ -37,6 +36,8 @@ output$MLBpicture <- renderImage({
   
   
 ############################################## TAB 4 -- Data outputs ########################
+
+## create player names
 playerChoice <- reactive({
   switch(input$players,
          "All Players" = "All",
@@ -48,6 +49,7 @@ playerChoice <- reactive({
 })
 
 ## full data tables
+## these are just for the popular players that i figured someone would maybe want to see
 output$dataOutput <- renderDataTable({
   findPlayer <- playerChoice()
   if (findPlayer == "All"){
@@ -76,7 +78,7 @@ output$dataOutput <- renderDataTable({
 #output$baseballData<- downloadHandler(
  # filename = "LahmanBaseballData.csv",
  # content = function(file) {
- ##   write.csv(file, row.names = FALSE)
+ ##   write.csv(myLahmanfile, row.names = FALSE)
  # }
 #)
 
@@ -120,7 +122,8 @@ subData <- reactive({
 })
 
 ## Create summary table
-
+## stats include minimum, maximum, mean, and standard deviation
+## these will change upon a click from the user!
 output$dataTable <- renderTable({
   setStat <- quo(!!sym(input$playerVars))  
   summaryStat <- subData() %>%
@@ -136,7 +139,7 @@ output$dataTable <- renderTable({
 output$baseballData<- downloadHandler(
   filename = "LahmanBaseballData.csv",
   content = function(file) {
-  write.csv(subData(),file, row.names = FALSE)
+  write.csv(myBatting,file, row.names = FALSE)
  }
 )
 
@@ -144,7 +147,8 @@ output$baseballData<- downloadHandler(
 #  summary(!!sym(input$playerVars))
 #})
 
-## Create plots
+## Create plots. Variables will be changed per the user's request. Some will stay fixed.
+## boxplot
 Outputplot <- reactive({
   if (input$plotChoice=="Box Plot"){
     plotCycle <- ggplot(data = subData(), aes(x = lgID, y = subData()[,input$playerVars], fill = lgID)) +
@@ -192,20 +196,19 @@ myFormula.mlr <- reactive({
     n <- length(input$predVars)
     formulaBuild1 <- paste0(input$predVars,c(rep("+", n-1), ""))
     formulaBuild1 <- paste0(formulaBuild1, collapse = "")
-    #temp <- paste0(temp^2)
     return(formula(paste0(input$respVar, '~', formulaBuild1)))
   }
 })
 
 ## this formula is used for regression trees and random forests
+## build formula for all variables selected or only some variables selected
 myFormula <- reactive({
   if (length(input$predVars)==0){
     return(formula(paste0(input$respVar,'~','G + AB + X2B + X3B + RBI + SB + BB + SO + IBB + HBP + SF + GIDP')))
   } else{
     n <- length(input$predVars)
-    formulaBuild <- paste0(input$predVars,c(rep("+", n-1), ""))
+    formulaBuild <- paste0(input$predVars,c(rep("*", n-1), ""))
     forumulaBuild <- paste0(formulaBuild, collapse = "")
-    #temp <- paste0(temp^2)
     return(formula(paste0(input$respVar, '~', forumulaBuild)))
   }
 })
@@ -267,7 +270,7 @@ output$rfSummary <- renderPrint({
   #rmserrf <- rndmForest()$results$RMSE
   
 
-## now we want to find each minimum RMSE value for each model
+## now we want to find each minimum RMSE value for each model and format it correctly/nicely
 ## for MLR RMSE
 output$mlrRMSEoutput <- renderPrint({
   mlrFit <- mlrFit()

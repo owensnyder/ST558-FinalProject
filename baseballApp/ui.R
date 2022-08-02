@@ -72,6 +72,8 @@ dashboardPage(skin="blue",
                           ## choose a baseball players from the list
                           column(6,
                                  h4("You can subset the data by players below:"),
+                                 h5("Note, these are some of the more popular players from the 2013-2017 seasons.
+                                    You may want to get yourself aquainted with some stellar seasons these players had."),
                                  selectInput(inputId = "players",
                                              label = "Choose a player or all the players to view",
                                              choices = c("All Players", 
@@ -262,7 +264,10 @@ tabItem(tabName = "Tab2",
                                                                    "HBP","SF", "GIDP"), multiple = TRUE),
                                            h6("The selections defualt to all variables. 
                                            Note that this may take longer to build models opposed to 
-                                              using fewer variables.")
+                                              using fewer variables."),
+                                           h6("Perhaps try a model with all variables 
+                                              to get an idea of how they will interact and then select 
+                                              variables of your personal choice."),
                                        ),
                                        
                                        ## select CV folds!
