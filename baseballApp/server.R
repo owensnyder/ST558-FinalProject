@@ -5,7 +5,7 @@ library(ggplot2)
 library(tidyverse)
 library(caret)
 library(Lahman)
-library(dashboardthemes)
+#library(dashboardthemes)
 
 
 
@@ -22,7 +22,7 @@ shinyServer(function(input, output, session) {
             href="https://cran.r-project.org/web/packages/Lahman/Lahman.pdf"))
   })
   output$mlbLink <- renderUI({
-    tagList("Major League Baseball official webaite", a("can be found here", href="https://www.mlb.com/"))
+    tagList("Major League Baseball official website", a("can be found here", href="https://www.mlb.com/"))
   })
   output$seanLahmanLink <- renderUI({
     tagList("Sean Lahman's offical wesbite", a("can be found here", href="https://www.seanlahman.com/"))
@@ -31,7 +31,7 @@ shinyServer(function(input, output, session) {
 ## output MLB image
 
 output$MLBpicture <- renderImage({
-   list(src = "../mlbpic.jpeg", width = "300px", height = "300px")
+   list(src = "../mlbpic.jpeg", width = "350", height = "300")
   }, deleteFile = FALSE)  
 
   
@@ -224,7 +224,7 @@ regTreeFit <- eventReactive(input$runModelButton,{
   fit.regTree <- train(myFormula(), data = dataSplit()[["trainData"]], method = "rpart",
         trControl = trainControl(method = "repeatedcv", number = input$cvFold, repeats = 3),
         preProcess = c("center", "scale"),
-        tuneGrid = data.frame(cp = seq(0, 0.1, 0.01)))
+        tuneGrid = data.frame(cp = seq(input$minCP, input$maxCP, input$stepSeq)))
   return(fit.regTree)
 })
 
@@ -233,7 +233,7 @@ rndmForest <- eventReactive(input$runModelButton,{
   fit.rf <- train(myFormula(), data = dataSplit()[["trainData"]], method = "rf",
                        trControl = trainControl(method = "repeatedcv", number = input$cvFold, repeats = 3),
                        preProcess = c("center", "scale"),
-                       tuneGrid = data.frame(mtry = 1:5))
+                       tuneGrid = data.frame(mtry = input$mtryMIN:input$mtryMAX))
   return(fit.rf)
 })
 
