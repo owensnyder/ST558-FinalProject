@@ -327,13 +327,13 @@ tabItem(tabName = "Tab2",
                                        column(9, 
                                               box(width = 12,
                                                   h3("RMSE on Training Data"),
-                                                  h5("Below, you will find the minimum RMSE output f
-                                                  or each model that you built. 
+                                                  h5("Below, you will find the minimum RMSE output 
+                                                  for each model that you built. 
                              The minimum was taken for each respective model RMSE output and the 
                              best model will be dtermined by the lowest RMSE of these three below. "),
                                                   ),
                                               box(width = 12, solidHeader = TRUE,
-                                                  title = "Training Data Outputs",
+                                                  title = "RMSE Outputs:",
                                                   h4(strong("Multiple Linear Regression")),
                                                   verbatimTextOutput("mlrRMSEoutput"),
                                                   h4(strong("Regression Tree")),
