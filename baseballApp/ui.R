@@ -327,8 +327,7 @@ tabItem(tabName = "Tab2",
                                                   h4(strong("Summary for Random Forest")),
                                                   verbatimTextOutput("rfSummary"))
                                        ),
-                                       
-                                       
+                                    
                                        column(9, 
                                               box(width = 12,
                                                   h3("RMSE on Training Data"),

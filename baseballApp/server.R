@@ -189,6 +189,7 @@ dataSplit <- reactive({
 })
 
 ## this is the formula for MLR 
+## build formula for all variables selected or only some variables selected
 myFormula.mlr <- reactive({
   if (length(input$predVars)==0){
     return(formula(paste0(input$respVar,'~','(G + AB + X2B + X3B + RBI + SB + BB + SO + IBB + HBP + SF + GIDP)^2')))
